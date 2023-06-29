@@ -4,6 +4,9 @@
 
 """
 CHANGELOG
+Version 1.2
+* Add edit counter
+
 Version 1.1
 * Bot will scan through all drafts in a category, rather than in just one user-specified page
 * Bot will output a message if a duplicate header is or isn't detected
@@ -17,11 +20,13 @@ import pywikibot
 
 # Main function to check the headers
 def remove_duplicate_headers(page):
+	global counter
 	# Local function variables
 	site = page.site
 	title = page.title()
 	text = page.text
-
+	counter = 0 # Counter for number of pages modified
+	
 	# Split the text into lines
 	lines = text.split("\n")
 
@@ -52,6 +57,7 @@ def remove_duplicate_headers(page):
 		print(f"Error occurred while saving page {title}: {e}")
 
 	if duplicate_header_detected:
+		counter += 1
 		print("Duplicate header detected and removed in page " + title + ".")
 	else:
 		print("No duplicate header detected in page " + title + ".")
@@ -65,8 +71,18 @@ page = pywikibot.Page(site, category_name)
 # Get pages in category
 pages = category.members()
 
+pagecount = 0 # Counter for number of pages scanned through
+draftcount = 0 # Counter for number of drafts scanned through
+
 # Loop through pages and remove duplicate headers
 for page in pages:
+	pagecount += 1
 	# Check if page is in draft namespace
 	if page.namespace() == 2:
+		draftcount += 1
 		remove_duplicate_headers(page)
+
+# Counter result
+print("UrbanBot scanned through a total of " + str(pagecount) + " pages with " + str(draftcount) + " drafts. A total of " + str(counter) \
+ + " pages were modified by Urban bot which makes " + str(pagecount / counter) + " pages modified per total page in category and " + \ 
+ str(draftcount / counter) + " pages modified per draft.")
