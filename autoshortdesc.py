@@ -1,9 +1,13 @@
-# UrbanBot Task 1: Add short descriptions to pages in a category
-# UV32 -- 06/14/2023
-# Version 1.2.1
+# UrbanBot autoshortdesc: Add short descriptions to pages in a category
+# UV32 -- 06/29/2023
+# Version 1.3
 
 '''
 CHANGELOG
+Version 1.3
+* Critical bugfixes
+* Refine output messages
+
 Version 1.2.1
 * Overall cleanup of code
 
@@ -35,6 +39,8 @@ pages = category.members()
 # Ask user for category short descriptions
 short_desc = input("Enter short description for pages in category " + category_name + ": ")
 
+added = 0 # Counter for short descriptions added.
+
 # Loop through pages, and add descriptions to their item
 for page in pages:
     # Get Wikidata item for page
@@ -45,8 +51,11 @@ for page in pages:
     else:
         # Check if item has short description
         if "en" in item.descriptions and item.descriptions["en"] != "":
-            print('Short description ("' + item.descriptions + '") already exists for ' + page.title() + ' on Wikidata.') # Using single quotes to show double quotes in the actual message.
+            print("Short description already exists for " + page.title() + " on Wikidata.")
         else:
             # If not, update item with short description
-            item.editDescriptions({"en": short_desc}, summary="UrbanBot task 1 - Adding description to item")
+            item.editDescriptions({"en": short_desc}, summary="UrbanBot - Adding description to item")
             print("Short description added to Wikidata item for " + page.title() + ": " + short_desc)
+            added += 1 # Add another short description to the counter
+
+print("Process finished. Added " + str(added) + " short descriptions to pages.")
