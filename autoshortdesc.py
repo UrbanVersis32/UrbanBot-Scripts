@@ -1,9 +1,12 @@
 # UrbanBot autoshortdesc: Add short descriptions to pages in a category
 # UV32 -- 06/29/2023
-# Version 1.3
+# Version 1.3.1
 
-'''
+"""
 CHANGELOG
+Version 1.3.1
+* Improve edit counter
+
 Version 1.3
 * Critical bugfixes
 * Refine output messages
@@ -20,8 +23,7 @@ Version 1.1
 
 Version 1.0
 * Initial script
-
-'''
+"""
 
 # Imports
 import pywikibot
@@ -39,23 +41,27 @@ pages = category.members()
 # Ask user for category short descriptions
 short_desc = input("Enter short description for pages in category " + category_name + ": ")
 
-added = 0 # Counter for short descriptions added.
+scanned = 0 # Counter for all pages scanned through
+counter = 0 # Counter for short descriptions added
 
 # Loop through pages, and add descriptions to their item
 for page in pages:
-    # Get Wikidata item for page
-    item = pywikibot.ItemPage.fromPage(page)
-    # Check on Wikidata if corresponding item exists
-    if not item.exists():
-        print("Corresponding Wikidata item for " + page.title() + " does not exist.")
-    else:
-        # Check if item has short description
-        if "en" in item.descriptions and item.descriptions["en"] != "":
-            print("Short description already exists for " + page.title() + " on Wikidata.")
-        else:
-            # If not, update item with short description
-            item.editDescriptions({"en": short_desc}, summary="UrbanBot - Adding description to item")
-            print("Short description added to Wikidata item for " + page.title() + ": " + short_desc)
-            added += 1 # Add another short description to the counter
+	# Get Wikidata item for page
+	item = pywikibot.ItemPage.fromPage(page)
+	# Check on Wikidata if corresponding item exists
+	if not item.exists():
+		print("Corresponding Wikidata item for " + page.title() + " does not exist.")
+	else:
+		# Check if item has short description
+		if "en" in item.descriptions and item.descriptions["en"] != "":
+			print("Short description already exists for " + page.title() + " on Wikidata.")
+		else:
+			# If not, update item with short description
+			item.editDescriptions({"en": short_desc}, summary="UrbanBot - Adding description to item")
+			print("Short description added to Wikidata item for " + page.title() + ": " + short_desc)
+			counter += 1 # Add another short description to the counter
+	scanned += 1
 
-print("Process finished. Added " + str(added) + " short descriptions to pages.")
+# Counter result
+print("Process finished. UrbanBot scanned a total of " + str(scanned) + " items. Of these, it added descriptions to " + str(counter) + /
+" items. There were " + str(scanned / counter) + " items modified per item scanned.")
