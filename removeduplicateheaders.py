@@ -1,9 +1,12 @@
 # UrbanBot removeduplicateheaders: Remove headers from draft articles and AfC submissions that have the same name as the page title
 # UV32 -- 06/29/2023
-# Version 1.1
+# Version 1.3
 
 """
 CHANGELOG
+Version 1.3
+* Critical bugfixes
+
 Version 1.2
 * Add edit counter
 
@@ -20,69 +23,57 @@ import pywikibot
 
 # Main function to check the headers
 def remove_duplicate_headers(page):
-	global counter
-	# Local function variables
-	site = page.site
-	title = page.title()
-	text = page.text
-	counter = 0 # Counter for number of pages modified
-	
-	# Split the text into lines
-	lines = text.split("\n")
+    # Local function variables
+    site = page.site
+    title = page.title()
+    text = page.text
 
-	new_lines = []
-	duplicate_header_detected = False  # Flag to track duplicate header detection
+    # Split the text into lines
+    lines = text.split("\n")
 
-	for line in lines:  # Check all lines of the page
-		if line.startswith("="):
-			header_text = line.strip("=").strip()
-			if header_text.lower() == title.lower():
-				# Skip this line if it has the same name as the page title
-				continue
-			elif header_text.lower().startswith("exclusion compliance"):
-				# Skip lines starting with "Exclusion Compliance"
-				continue
-			else:
-				duplicate_header_detected = True  # Set flag if duplicate header is detected
+    new_lines = []
+    duplicate_header_detected = False  # Flag to track duplicate header detection
 
-		# Add the line to the new lines list
-		new_lines.append(line)
+    for line in lines:  # Check all lines of the page
+        if line.startswith("=") or line.startswith("==") or line.startswith("==="):
+            header_text = line.strip().lstrip("=").strip()
+            if header_text.lower() == title.lower():
+                duplicate_header_detected = True  # Set flag if duplicate header is detected
+                continue # Skip this line if it has the same name as the page title
+            elif header_text.lower().startswith("exclusion compliance"):
+                # Skip lines starting with "Exclusion Compliance"
+                continue
 
-	# Join the new lines and save the updated text
-	new_text = '\n'.join(new_lines)
-	try:
-		page.text = new_text
-		page.save("UrbanBot - Removing duplicate headers")
-	except pywikibot.exceptions.OtherPageSaveError as e:
-		print(f"Error occurred while saving page {title}: {e}")
+        # Add the line to the new lines list
+        new_lines.append(line)
 
-	if duplicate_header_detected:
-		counter += 1
-		print("Duplicate header detected and removed in page " + title + ".")
-	else:
-		print("No duplicate header detected in page " + title + ".")
+    # Join the new lines and save the updated text
+    new_text = '\n'.join(new_lines)
+    try:
+        page.text = new_text
+        page.save("UrbanBot - Removing duplicate headers")
+    except pywikibot.exceptions.OtherPageSaveError as e:
+        print(f"Error occurred while saving page {title}: {e}")
+
+    if duplicate_header_detected:
+        print("Duplicate header detected and removed in page " + title + ".")
+    else:
+        print("No duplicate header detected in page " + title + ".")
 
 # Ask user for category name
 category_name = input("Enter English Wikipedia category name: ")
 
 site = pywikibot.Site("en", "wikipedia")
-page = pywikibot.Page(site, category_name)
+category = pywikibot.Category(site, category_name)
 
 # Get pages in category
 pages = category.members()
 
-pagecount = 0 # Counter for number of pages scanned through
-draftcount = 0 # Counter for number of drafts scanned through
-
 # Loop through pages and remove duplicate headers
 for page in pages:
-	pagecount += 1
-	# Check if page is in draft namespace
-	if page.namespace() == 2:
-		draftcount += 1
-		remove_duplicate_headers(page)
+    # Check if page is in draft namespace
+    if page.namespace() == 118:
+        remove_duplicate_headers(page)
 
 # Counter result
-print("UrbanBot scanned through a total of " + str(pagecount) + " pages with " + str(draftcount) + " drafts. A total of " + str(counter) \
- + " pages were modified by Urban bot which makes " + str(pagecount / counter) + " pages modified per total page in category and " + \ 
- str(draftcount / counter) + " pages modified per draft.")
+print("Process completed.")
