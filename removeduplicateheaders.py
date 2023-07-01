@@ -1,9 +1,12 @@
 # UrbanBot removeduplicateheaders: Remove headers from draft articles and AfC submissions that have the same name as the page title
-# UV32 -- 06/29/2023
-# Version 1.3
+# UV32 -- 07/01/2023
+# Version 1.4
 
 """
 CHANGELOG
+Version 1.4
+* Re-add edit counter
+
 Version 1.3
 * Critical bugfixes
 
@@ -22,16 +25,17 @@ Version 1.0
 import pywikibot
 
 # Main function to check the headers
-def remove_duplicate_headers(page):
+def remove_duplicate_headers(page, modified):
     # Local function variables
     site = page.site
     title = page.title()
     text = page.text
-
+	
     # Split the text into lines
     lines = text.split("\n")
 
     new_lines = []
+    
     duplicate_header_detected = False  # Flag to track duplicate header detection
 
     for line in lines:  # Check all lines of the page
@@ -57,8 +61,10 @@ def remove_duplicate_headers(page):
 
     if duplicate_header_detected:
         print("Duplicate header detected and removed in page " + title + ".")
+        modified = True
     else:
         print("No duplicate header detected in page " + title + ".")
+        modified = False
 
 # Ask user for category name
 category_name = input("Enter English Wikipedia category name: ")
@@ -69,11 +75,19 @@ category = pywikibot.Category(site, category_name)
 # Get pages in category
 pages = category.members()
 
+# Counters
+scanned = 0
+counter = 0
+
 # Loop through pages and remove duplicate headers
 for page in pages:
-    # Check if page is in draft namespace
-    if page.namespace() == 118:
-        remove_duplicate_headers(page)
+	# Check if page is in draft namespace
+	if page.namespace() == 118:
+		remove_duplicate_headers(page)
+		if remove_duplicate_headers(modified) == True:
+			counter += 1
+		scanned += 1
 
 # Counter result
-print("Process completed.")
+if scanned > 0: # Make sure final message doesn't print before for loop is finished
+	print("Process completed. UrbanBot scanned through a total of " + str(scanned) + " drafts. A total of " + str(counter) + " pages were modified by Urban bot which makes" + str(scanned / counter) + " pages scanned per draft modified.")
