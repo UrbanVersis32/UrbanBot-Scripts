@@ -1,9 +1,12 @@
 # UrbanBot autoshortdesc: Add short descriptions to pages in a category
-# UV32 -- 06/29/2023
-# Version 1.3.1
+# UV32 -- 07/01/2023
+# Version 1.3.2
 
 """
 CHANGELOG
+Version 1.3.2
+* Small change to edit output text
+
 Version 1.3.1
 * Improve edit counter
 
@@ -63,5 +66,4 @@ for page in pages:
 	scanned += 1
 
 # Counter result
-print("Process finished. UrbanBot scanned a total of " + str(scanned) + " items. Of these, it added descriptions to " + str(counter) + /
-" items. There were " + str(scanned / counter) + " items modified per item scanned.")
+print("Process finished. UrbanBot scanned a total of " + str(scanned) + " items. Of these, it added descriptions to " + str(counter) + " items. There were " + str(scanned / counter) + " items scanned per item modified.")
