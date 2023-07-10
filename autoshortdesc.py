@@ -1,9 +1,12 @@
 # UrbanBot autoshortdesc: Add short descriptions to pages in a category
 # UV32 -- 07/11/2023
-# Version 1.5.1
+# Version 1.5.2
 
 """
 CHANGELOG
+Version 1.5.2
+* More bugfixes
+
 Version 1.5.1
 * Bugfixes
 
@@ -74,16 +77,12 @@ if len(short_desc) > 40: # Likely too many characters
 	if desc_too_long.lower() == "n":
 		print("Exiting program")
 		exit()
-	else:
-		return # Exit the loop
 
 if len(short_desc) < 15: # Likely too few characters
 	desc_too_short = input("Description inputted contains fewer than 15 characters. Continue? Y/n ")
 	if desc_too_short.lower() == "n":
 		print("Exiting program")
 		exit()
-	else:
-		return # Exit the loop
 	
 scanned = 0 # Counter for all pages scanned through
 counter = 0 # Counter for short descriptions added
@@ -109,6 +108,11 @@ for page in pages:
 				print("Error 3 - Unable to write description to Wikidata item")
 	scanned += 1
 
+if scanned / counter == 0: # Prevent the divide by zero error
+	scratio = 0
+else:
+	scratio = scanned / counter
+
 # Counter result
 if scanned > 0: # Make sure final message doesn't print before the for loop is finished
-	print("Process finished. UrbanBot scanned a total of " + str(scanned) + " items. Of these, it added descriptions to " + str(counter) + " items. There were " + str(scanned / counter) + " items scanned per item modified.")
+	print("Process finished. UrbanBot scanned a total of " + str(scanned) + " items. Of these, it added descriptions to " + str(counter) + " items. There were " + str(scratio) + " items scanned per item modified.")
