@@ -1,9 +1,12 @@
 # UrbanBot autoshortdesc: Add short descriptions to pages in a category
-# UV32 -- 07/10/2023
-# Version 1.5
+# UV32 -- 07/11/2023
+# Version 1.5.1
 
 """
 CHANGELOG
+Version 1.5.1
+* Bugfixes
+
 Version 1.5
 * Improve error responding, bugfixes from 1.4
 
@@ -72,7 +75,7 @@ if len(short_desc) > 40: # Likely too many characters
 		print("Exiting program")
 		exit()
 	else:
-		continue
+		return # Exit the loop
 
 if len(short_desc) < 15: # Likely too few characters
 	desc_too_short = input("Description inputted contains fewer than 15 characters. Continue? Y/n ")
@@ -80,7 +83,7 @@ if len(short_desc) < 15: # Likely too few characters
 		print("Exiting program")
 		exit()
 	else:
-		continue
+		return # Exit the loop
 	
 scanned = 0 # Counter for all pages scanned through
 counter = 0 # Counter for short descriptions added
