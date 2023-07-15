@@ -1,9 +1,13 @@
 # UrbanBot autoshortdesc: Add short descriptions to English Wikipedia pages in a category
 # UV32 -- 07/15/2023
-# Version 1.7
+# Version 1.7.1
 
 """
 CHANGELOG
+Version 1.7.1
+* Add circumstance for user inputting "none" as a short description
+* Improve output messages
+
 Version 1.7
 * Modify code to add the short description template to a page
 
@@ -64,39 +68,46 @@ Error 3 - Unable to write description to Wikidata item
 import pywikibot
 
 # Ask user for category name
-category_name = input("Enter English Wikipedia category name: ")
+category_name = input("INPUT: Enter English Wikipedia category name: ")
 
 # Set up site and category
 try:
     site = pywikibot.Site("en", "wikipedia")
     category = pywikibot.Category(site, category_name)
 except:
-    print("Error 0 - Unable to access Wikipedia.")
+    print("ERROR: Error 0 - Unable to access Wikipedia.")
     exit()
 
 # Get pages in category
 try:
     pages = category.members()
 except: # Category does not exist
-    print("Error 1 - Wikipedia category specified does not exist.")
+    print("ERROR: Error 1 - Wikipedia category specified does not exist.")
     exit()
 
 # Ask user for category short descriptions
-short_desc = input("Enter short description for pages in category " + category_name + ": ")
+short_desc = input("INPUT: Enter short description for pages in category " + category_name + ": ")
 
 if len(short_desc) > 40: # Likely too many characters
-    desc_too_long = input("Short description specified contains more than 40 characters. Continue? Y/n ")
+    desc_too_long = input("INPUT: Short description specified contains more than 40 characters. Continue? Y/n ")
     if desc_too_long.lower() == "n":
-        print("Exiting program")
+        print("EXIT: Exiting program")
         exit()
 
 if len(short_desc) < 15: # Likely too few characters
-    desc_too_short = input("Short description specified contains fewer than 15 characters. Continue? Y/n ")
+    desc_too_short = input("INPUT: Short description specified contains fewer than 15 characters. Continue? Y/n ")
     if desc_too_short.lower() == "n":
-        print("Exiting program")
+        print("EXIT: Exiting program")
         exit()
 
-print("Beginning write process.")
+if short_desc == "none" or short_desc == "None":
+	short_desc == "none" # Make sure it's lowercase
+	short_desc_none = input("INPUT: Short description inputted will cause the page to intentionally have no short description. Continue? Y/n ")
+	if short_desc_none.lower() == "n":
+		print("EXIT: Exiting program")
+		exit()
+	
+print("INFO: Beginning write process.")
 
 scanned = 0 # Counter for all pages scanned through
 counter = 0 # Counter for short descriptions added
@@ -105,16 +116,16 @@ counter = 0 # Counter for short descriptions added
 for page in pages:
     # Check if page already has description
     if "{{Short description|" in page.text:
-        print("Short description template already exists for " + page.title())
+        print("INFO: Short description template already exists for " + page.title())
     else:
         # If not, update page with description template
         try:
             page.text = "{{Short description|" + short_desc + "}}\n" + page.text
             page.save(summary="UrbanBot task 1 - Adding short description template")
-            print("Short description template added to page " + page.title())
+            print("ACTION: Short description template added to page " + page.title())
             counter += 1 # Add another description to the counter
         except:
-            print("Error 2 - Unable to write short description template to English Wikipedia page")
+            print("ERROR: Error 2 - Unable to write short description template to English Wikipedia page")
     scanned += 1
 
 if scanned == 0: # Prevent the divide by zero error
@@ -124,4 +135,4 @@ else:
 
 # Counter result
 if scanned > 0: # Make sure final message doesn't print before the for loop is finished
-    print("Process finished. UrbanBot scanned a total of " + str(scanned) + " pages. Of these, it added short description templates to " + str(counter) + " pages. There were " + str(scratio) + " pages scanned per page modified.")
+    print("INFO: Process finished. UrbanBot scanned a total of " + str(scanned) + " pages. Of these, it added short description templates to " + str(counter) + " pages. There were " + str(scratio) + " pages scanned per page modified.")
