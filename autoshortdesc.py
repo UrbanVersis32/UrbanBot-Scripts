@@ -1,9 +1,12 @@
-# UrbanBot autoshortdesc: Add short descriptions to pages in a category
+# UrbanBot autoshortdesc: Add short descriptions to English Wikipedia pages in a category
 # UV32 -- 07/14/2023
-# Version 1.5.3
+# Version 1.6
 
 """
 CHANGELOG
+Version 1.6
+* Modify edit process to edit Wikipedia short descriptions instead of Wikidata descriptions (moving bot request and bot process to en-wiki instead)
+
 Version 1.5.3
 * Improvements to the output information
 * Even more bugfixes
@@ -61,64 +64,59 @@ category_name = input("Enter English Wikipedia category name: ")
 
 # Set up site and category
 try:
-	site = pywikibot.Site("en", "wikipedia")
-	category = pywikibot.Category(site, category_name)
+    site = pywikibot.Site("en", "wikipedia")
+    category = pywikibot.Category(site, category_name)
 except:
-	print("Error 0 - Unable to access Wikipedia.")
-	
+    print("Error 0 - Unable to access Wikipedia.")
+    exit()
+
 # Get pages in category
 try:
-	pages = category.members()
+    pages = category.members()
 except: # Category does not exist
-	print("Error 1 - Wikipedia category does not exist.")
-	exit()
+    print("Error 1 - Wikipedia category specified does not exist.")
+    exit()
 
 # Ask user for category short descriptions
 short_desc = input("Enter short description for pages in category " + category_name + ": ")
 
 if len(short_desc) > 40: # Likely too many characters
-	desc_too_long = input("Description inputted contains more than 40 characters. Continue? Y/n ")
-	if desc_too_long.lower() == "n":
-		print("Exiting program")
-		exit()
+    desc_too_long = input("Short description specified contains more than 40 characters. Continue? Y/n ")
+    if desc_too_long.lower() == "n":
+        print("Exiting program")
+        exit()
 
 if len(short_desc) < 15: # Likely too few characters
-	desc_too_short = input("Description inputted contains fewer than 15 characters. Continue? Y/n ")
-	if desc_too_short.lower() == "n":
-		print("Exiting program")
-		exit()
+    desc_too_short = input("Short description specified contains fewer than 15 characters. Continue? Y/n ")
+    if desc_too_short.lower() == "n":
+        print("Exiting program")
+        exit()
 
 print("Beginning write process.")
-	
+
 scanned = 0 # Counter for all pages scanned through
 counter = 0 # Counter for short descriptions added
 
-# Loop through pages, and add descriptions to their item
+# Loop through pages, and add short descriptions
 for page in pages:
-	# Get Wikidata item for page
-	item = pywikibot.ItemPage.fromPage(page)
-	# Check on Wikidata if corresponding item exists
-	if not item.exists():
-		print("Error 2 - Corresponding Wikidata item for " + page.title() + " does not exist.")
-	else:
-		# Check if item already has description
-		if "en" in item.descriptions and item.descriptions["en"] != "":
-			print("Description already exists for " + page.title() + " on Wikidata.")
-		else:
-			# If not, update item with description
-			try:
-				item.editDescriptions({"en": short_desc}, summary="UrbanBot task 1 - Adding description to item")
-				print("Description added to Wikidata item for " + page.title())
-				counter += 1 # Add another description to the counter
-			except:
-				print("Error 3 - Unable to write description to Wikidata item")
-	scanned += 1
+    # Check if page already has description
+    if "shortdesc" in page.properties() and page.properties()["shortdesc"] != "":
+        print("Short description already exists for " + page.title())
+    else:
+        # If not, update page with description
+        try:
+            page.edit(shortdesc=short_desc, summary="UrbanBot task 1 - Adding short description to page")
+            print("Short description added to page " + page.title())
+            counter += 1 # Add another description to the counter
+        except:
+            print("Error 2 - Unable to write short description to English Wikipedia page")
+    scanned += 1
 
 if scanned == 0: # Prevent the divide by zero error
-	scratio = 0
+    scratio = 0
 else:
-	scratio = round(scanned / counter, 3) # Round to the hundredths place
+    scratio = round(scanned / counter, 3) # Round to the hundredths place
 
 # Counter result
 if scanned > 0: # Make sure final message doesn't print before the for loop is finished
-	print("Process finished. UrbanBot scanned a total of " + str(scanned) + " items. Of these, it added descriptions to " + str(counter) + " items. There were " + str(scratio) + " items scanned per item modified.")
+    print("Process finished. UrbanBot scanned a total of " + str(scanned) + " pages. Of these, it added short descriptions to " + str(counter) + " pages. There were " + str(scratio) + " pages scanned per page modified.")
