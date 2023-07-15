@@ -1,11 +1,15 @@
 # UrbanBot autoshortdesc: Add short descriptions to English Wikipedia pages in a category
-# UV32 -- 07/14/2023
-# Version 1.6
+# UV32 -- 07/15/2023
+# Version 1.7
 
 """
 CHANGELOG
+Version 1.7
+* Modify code to add the short description template to a page
+
 Version 1.6
 * Modify edit process to edit Wikipedia short descriptions instead of Wikidata descriptions (moving bot request and bot process to en-wiki instead)
+* More improvements to the output information
 
 Version 1.5.3
 * Improvements to the output information
@@ -100,16 +104,17 @@ counter = 0 # Counter for short descriptions added
 # Loop through pages, and add short descriptions
 for page in pages:
     # Check if page already has description
-    if "shortdesc" in page.properties() and page.properties()["shortdesc"] != "":
-        print("Short description already exists for " + page.title())
+    if "{{Short description|" in page.text:
+        print("Short description template already exists for " + page.title())
     else:
-        # If not, update page with description
+        # If not, update page with description template
         try:
-            page.edit(shortdesc=short_desc, summary="UrbanBot task 1 - Adding short description to page")
-            print("Short description added to page " + page.title())
+            page.text = "{{Short description|" + short_desc + "}}\n" + page.text
+            page.save(summary="UrbanBot task 1 - Adding short description template")
+            print("Short description template added to page " + page.title())
             counter += 1 # Add another description to the counter
         except:
-            print("Error 2 - Unable to write short description to English Wikipedia page")
+            print("Error 2 - Unable to write short description template to English Wikipedia page")
     scanned += 1
 
 if scanned == 0: # Prevent the divide by zero error
@@ -119,4 +124,4 @@ else:
 
 # Counter result
 if scanned > 0: # Make sure final message doesn't print before the for loop is finished
-    print("Process finished. UrbanBot scanned a total of " + str(scanned) + " pages. Of these, it added short descriptions to " + str(counter) + " pages. There were " + str(scratio) + " pages scanned per page modified.")
+    print("Process finished. UrbanBot scanned a total of " + str(scanned) + " pages. Of these, it added short description templates to " + str(counter) + " pages. There were " + str(scratio) + " pages scanned per page modified.")
