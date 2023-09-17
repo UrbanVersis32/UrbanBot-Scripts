@@ -1,0 +1,3 @@
+addcat.py -- Adds the category "Category:All Wikipedia Bots" to UrbanBot's userpage.
+
+Updated 09/16/2023

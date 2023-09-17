@@ -1,0 +1,6 @@
+The Remove Duplicate Headers will remove all headers in an article which
+have the article's name in them. This is a common issue with new users
+who don't realize that there is not supposed to be a header which
+duplicates the title.
+
+Update 09/16/2023

@@ -1,0 +1,6 @@
+The Auto Short Description code for UrbanBot allows the user to enter in
+a category and a short description, and the bot will apply the short
+description entered to all pages in the category which don't already
+have one.
+
+Updated 09/16/2023
