@@ -1,9 +1,12 @@
 # UrbanBot autoshortdesc: Add short descriptions to English Wikipedia pages in a category
-# UV32 -- 07/17/2023
-# Version 1.8
+# UV32 -- 01/26/2025
+# Version 1.9
 
 """
 CHANGELOG
+Version 1.9
+* Add a prompt asking to apply short desc for each page
+
 Version 1.8
 * Add additional processes to check if there is a template-applied short description on the page as well as the short desc template on the page
 
@@ -128,10 +131,13 @@ for page in pages:
         else:
             # If not, update page with description template
             try:
-                page.text = "{{Short description|" + short_desc + "}}\n" + page.text
-                page.save(summary="UrbanBot task 1 - Adding short description template")
-                print("ACTION: Short description template added to page " + page.title())
-                counter += 1 # Add another description to the counter
+                # Semi-automated check to ensure each page is applicable for the short desc
+                allow = input("Do you want to add a short description for \"" + page.title() + "\"? Leave blank for yes, and enter anything for no:")
+                if allow == "":
+                    page.text = "{{Short description|" + short_desc + "}}\n" + page.text
+                    page.save(summary="UrbanBot task 1 - Adding short description template")
+                    print("ACTION: Short description template added to page " + page.title())
+                    counter += 1 # Add another description to the counter
             except:
                 print("ERROR: Error 2 - Unable to write short description template to English Wikipedia page")
     scanned += 1
