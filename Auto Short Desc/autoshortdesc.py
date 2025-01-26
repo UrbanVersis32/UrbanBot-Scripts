@@ -1,9 +1,12 @@
 # UrbanBot autoshortdesc: Add short descriptions to English Wikipedia pages in a category
 # UV32 -- 01/26/2025
-# Version 1.9
+# Version 1.9.1
 
 """
 CHANGELOG
+Version 1.9.1
+* Bug fixes
+
 Version 1.9
 * Add a prompt asking to apply short desc for each page
 
@@ -122,7 +125,7 @@ counter = 0 # Counter for short descriptions added
 # Loop through pages, and add short descriptions
 for page in pages:
     # Check if page already has template-applied short description
-    if textlib.has_template(page.text, 'Short description'):
+    if "Short description" in textlib.extract_templates_and_params(page.text, False, False):
         print("INFO: Template-applied short description already exists for " + page.title())
     else:
         # Check if page already has short description template
