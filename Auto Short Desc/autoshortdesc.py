@@ -4,6 +4,9 @@
 
 """
 CHANGELOG
+Version 1.9.2
+* More bug fixes
+
 Version 1.9.1
 * Bug fixes
 
@@ -124,25 +127,24 @@ counter = 0 # Counter for short descriptions added
 
 # Loop through pages, and add short descriptions
 for page in pages:
-    # Check if page already has template-applied short description
-    if "Short description" in textlib.extract_templates_and_params(page.text, False, False):
-        print("INFO: Template-applied short description already exists for " + page.title())
+    # Check if page is not article
+    if "Category:" in page.title() or "Template:" in page.title() or "User:" in page.title():
+        print("INFO: " + page.title() + " is not an article")
+    # Check if short desc already exists
+    elif "{{short description|" in page.text.lower():
+        print("INFO: Short description template already exists for " + page.title())
     else:
-        # Check if page already has short description template
-        if "{{Short description|" in page.text:
-            print("INFO: Short description template already exists for " + page.title())
-        else:
-            # If not, update page with description template
-            try:
-                # Semi-automated check to ensure each page is applicable for the short desc
-                allow = input("Do you want to add a short description for \"" + page.title() + "\"? Leave blank for yes, and enter anything for no:")
-                if allow == "":
-                    page.text = "{{Short description|" + short_desc + "}}\n" + page.text
-                    page.save(summary="UrbanBot task 1 - Adding short description template")
-                    print("ACTION: Short description template added to page " + page.title())
-                    counter += 1 # Add another description to the counter
-            except:
-                print("ERROR: Error 2 - Unable to write short description template to English Wikipedia page")
+        # If not, update page with description template
+        try:
+            # Semi-automated check to ensure each page is applicable for the short desc
+            allow = input("Do you want to add a short description for \"" + page.title() + "\"? Leave blank for yes, and enter anything for no:")
+            if allow == "":
+                page.text = "{{Short description|" + short_desc + "}}\n" + page.text
+                page.save(summary="UrbanBot task 1 - Adding short description template")
+                print("ACTION: Short description template added to page " + page.title())
+                counter += 1 # Add another description to the counter
+        except:
+            print("ERROR: Error 2 - Unable to write short description template to English Wikipedia page")
     scanned += 1
 
 if scanned == 0: # Prevent the divide by zero error
